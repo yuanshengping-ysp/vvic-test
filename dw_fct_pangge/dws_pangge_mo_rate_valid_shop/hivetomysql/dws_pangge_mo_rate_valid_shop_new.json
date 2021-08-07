@@ -1,0 +1,115 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                 "channel": 3
+            },
+            "errorLimit": {
+                "record": 3,
+                "percentage": 0.02
+            }
+        },
+        "content": [
+            {
+                "reader": {
+                   "name": "hdfsreader",
+                   "parameter": {
+                        "path": "/user/hive/warehouse/temp.db/dws_pangge_mo_rate_valid_shop/*",
+                        "defaultFS": "hdfs://master:8020",
+                        "column": [
+                        		   {
+                        		   	 "index": 0,
+                                "type": "string"
+                                },
+                               {
+                                "index": 1,
+                                "type": "string"
+                               },
+                               {
+                                "index": 2,
+                                "type": "string"
+                               },
+                                {
+                                "index": 3,
+                                "type": "string"
+                               },
+                               {
+                                "index": 4,
+                                "type": "string"
+                               },
+                                {
+                                "index": 5,
+                                "type": "string"
+                               },
+                               {
+                                "index": 6,
+                                "type": "string"
+                               },
+                                {
+                                "index": 7,
+                                "type": "string"
+                               },
+                               {
+                                "index": 8,
+                                "type": "string"
+                               },
+                               {
+                                "index": 9,
+                                "type": "string"
+                               },
+                               {
+                                "index": 10,
+                                "type": "string"
+                               },
+                        	     {
+                               "type": "string",
+                                "value": "$DATE"
+                               }
+                        ],
+                        "fileType": "text",
+                        "encoding": "UTF-8",
+                        "fieldDelimiter": "\u0001"
+                    }
+                      
+                },
+                "writer": {
+                    "name": "mysqlwriter",
+                    "parameter": {
+                       "writeMode": "insert",
+                        "username": "biz_i",
+                        "password": "1JL7FNMKI690LwHa",
+                        "column": [
+                            "city_market_id",
+                            "shop_id",
+                            "mo_rate_7d",
+                            "mo_rate_2d",
+                            "ship_rate_2d",
+                            "mo_lack_rate_7d",
+                            "receive_item_num_7d",
+                            "pay_item_num_7d",
+                            "receive_item_num_2d",
+                            "ship_item_num_2d",
+                            "d1",
+                            "date"
+                        ],
+                        "preSql": [
+                            "delete from dws_pangge_mo_rate_valid_shop where date = '$DATE' "
+                        ],
+                         "postSql": [
+                            " "
+                        ],
+                         "connection": [
+                            {
+                                "jdbcUrl": "jdbc:mysql://probi001.mysql.rds.aliyuncs.com:3306/vvic-bi",
+                                "table": [
+                                    "dws_pangge_mo_rate_valid_shop"
+                                ]
+                            }
+                        ]
+                      
+                    }
+                }
+            }
+        ]
+    }
+}

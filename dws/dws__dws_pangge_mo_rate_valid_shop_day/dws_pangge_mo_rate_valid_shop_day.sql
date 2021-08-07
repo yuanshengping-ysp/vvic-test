@@ -1,0 +1,14 @@
+-- 步骤1：创建表
+create table if not exists dws.dws_pangge_mo_rate_valid_shop_day ( `city_market_id` int comment '市场站点id' ,`shop_id` bigint comment '档口id' ,`mo_rate_7d` double COMMENT '7天有效入仓率' ,`mo_rate_2d` double COMMENT '48H有效入仓率' ,`ship_rate_2d` double COMMENT '48H实发率' ,`mo_lack_rate_7d` double COMMENT '7天缺货率' ,`receive_item_num_7d` double COMMENT '7天入仓件数' ,`pay_item_num_7d` double COMMENT '7天下单件数' ,`receive_item_num_2d` double COMMENT '48H入仓件数' ,`ship_item_num_2d` double COMMENT '48H实发件数' ,`d1` string COMMENT '时间窗口' ,`ad_cost_amt_14d` float comment '近14天cpt/cpc/slzz广告消耗金额' ,`is_member_shop` int comment '是否档口会员' ,`qm_amt` float comment '商业化账户期末余额' ) comment '搜款网代发有效入仓率及广告统计表' partitioned by (`date` string comment '统计日期' ) stored as parquet location 'hdfs://master:8020/user/hive/warehouse/dws.db/dws_pangge_mo_rate_valid_shop_day';
+
+-- 关联数据 
+drop table if exists temp.dws_pangge_mo_rate_valid_shop_day_temp1 ;
+create table if not exists temp.dws_pangge_mo_rate_valid_shop_day_temp1 as select t1.`city_market_id` ,t1.`shop_id` ,t1.`mo_rate` as `mo_rate_7d` ,t1.`mo_rate_2d` ,t1.`ship_rate_2d` ,t1.`mo_lack_rate` as `mo_lack_rate_7d` ,t1.`receive_item_num` as `receive_item_num_7d` ,t1.`pay_item_num` as `pay_item_num_7d` ,t1.`receive_item_num_2d` ,t1.`ship_item_num_2d` ,t1.`d1` ,t1.`date` ,nvl(t2.`ad_cost_amt_14d`,0) as `ad_cost_amt_14d` ,nvl(t3.`is_member_shop`,0) as `is_member_shop` ,nvl(t4.`qm_amt`,0) as `qm_amt` from (select * from dws.dws_pangge_mo_rate_valid_shop where `date`>='${hivevar:day}' and `date`<='${hivevar:day}') t1 left join (select `date` ,`shop_id` ,nvl(`cpt_cost_amt_2w`,0)+nvl(`cpc_cost_amt_2w`,0)+nvl(`slzz_cost_amt_2w`,0) as `ad_cost_amt_14d` from dws.dws_plat_shop_roi_ad_money_day where `date`>='${hivevar:day}' and `date`<='${hivevar:day}') t2 on t1.`date`=t2.`date` and t1.`shop_id`=t2.`shop_id` left join (select `date` ,`id` as `shop_id` ,`is_member_shop` from ods.vvic__t_shop where `date`>='${hivevar:day}' and `date`<='${hivevar:day}') t3 on t1.`date`=t3.`date` and t1.`shop_id`=t3.`shop_id` left join (select `date` ,`shop_id` ,`qm_amt` from dwd.dwd_business_vvic_user_account_daily where `date`>='${hivevar:day}' and `date`<='${hivevar:day}') t4 on t1.`date`=t4.`date` and t1.`shop_id`=t4.`shop_id` ;
+
+-- 结果数据写入
+set hive.exec.dynamic.partition=true;
+set hive.exec.dynamic.partition.mode=nonstrict;
+set hive.exec.max.dynamic.partitions.pernode=100;
+set hive.exec.max.dynamic.partitions=1000;
+set hive.exec.max.created.files=10000;
+insert overwrite table dws.dws_pangge_mo_rate_valid_shop_day partition(`date`) select `city_market_id` ,`shop_id` ,`mo_rate_7d` ,`mo_rate_2d` ,`ship_rate_2d` ,`mo_lack_rate_7d` ,`receive_item_num_7d` ,`pay_item_num_7d` ,`receive_item_num_2d` ,`ship_item_num_2d` ,`d1` ,`ad_cost_amt_14d` ,`is_member_shop` ,`qm_amt` ,`date` from temp.dws_pangge_mo_rate_valid_shop_day_temp1 ;

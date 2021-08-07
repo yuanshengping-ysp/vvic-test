@@ -1,0 +1,112 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                 "channel": 3
+            },
+            "errorLimit": {
+                "record": 3,
+                "percentage": 0.02
+            }
+        },
+        "content": [
+            {
+                "reader": {
+                   "name": "hdfsreader",
+                   "parameter": {
+                        "path": "/user/hive/warehouse/rpt.db/rpt_cooperate_shop_daily3/date=$DATE/*",
+                        "defaultFS": "hdfs://master:8020",
+                        "column": [
+                               {
+                               "type": "string",
+                                "value": '$DATE'
+                               },
+                               {
+                                "index": 0,
+                                "type": "long"
+                                },
+                               {
+                                "index": 1,
+                                "type": "string"
+                               },
+                               {
+                                "index": 2,
+                                "type": "string"
+                               },
+                                {
+                                "index": 3,
+                                "type": "long"
+                               },
+                               {
+                                "index": 4,
+                                "type": "string"
+                               },
+                                {
+                                "index": 5,
+                                "type": "long"
+                               },
+                               {
+                                "index": 6,
+                                "type": "string"
+                               },
+                                {
+                                "index": 7,
+                                "type": "long"
+                               },
+                               {
+                                "index": 8,
+                                "type": "long"
+                               },
+                               {
+                                "index": 9,
+                                "type": "long"
+                               },
+                               {
+                                "index": 10,
+                                "type": "string"
+                               }
+                        ],
+                        "fileType": "text",
+                        "encoding": "UTF-8",
+                        "fieldDelimiter": "\u0001"
+                    }
+                      
+                },
+                "writer": {
+                    "name": "mysqlwriter",
+                    "parameter": {
+                       "writeMode": "insert",
+                        "username": "biz_i",
+                        "password": "1JL7FNMKI690LwHa",
+                        "column": [
+                             "date",
+                             "shop_id", 
+                             "shop_name", 
+                             "shop_position", 
+                             "bid", 
+                             "market_name", 
+                             "print_type", 
+                             "print_type_name", 
+                             "enallot_item_num", 
+                             "allot_item_num", 
+                             "receive_item_num",
+                             "insert_time"
+                        ],
+                        "preSql": [
+                            "delete from rpt_cooperate_shop_daily3 where date = '$DATE'  "
+                        ],
+                         "connection": [
+                            {
+                                "jdbcUrl": "jdbc:mysql://probi001.mysql.rds.aliyuncs.com:3306/vvic-bi",
+                                "table": [
+                                    "rpt_cooperate_shop_daily3"
+                                ]
+                            }
+                        ]
+                      
+                    }
+                }
+            }
+        ]
+    }
+}

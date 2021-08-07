@@ -1,0 +1,20 @@
+
+CREATE TABLE `dws.dws_plat_live_item_day`(
+  `item_id` bigint COMMENT '商品id', 
+  `vcid` bigint COMMENT '商品类目', 
+  `shop_id` bigint COMMENT '档口id', 
+  `pay_item_num_3d` bigint COMMENT '近3天销量', 
+  `pay_user_num_3d` bigint COMMENT '近3天下单用户数', 
+  `up_time` string COMMENT '上新时间')
+    PARTITIONED BY ( 
+  `date` string)
+ROW FORMAT SERDE 
+  'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe' 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.mapred.TextInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+  'hdfs://master:8020/user/hive/warehouse/dws.db/dws_plat_live_item_day'
+TBLPROPERTIES (
+  'transient_lastDdlTime'='1615188212')

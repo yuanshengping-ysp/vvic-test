@@ -1,0 +1,20 @@
+CREATE TABLE `dws.dws_pangge_item_allot_day`(
+  `city_market_id` bigint, 
+  `shop_id` int, 
+  `item_id` bigint, 
+  `allot_ratio_1d` double, 
+  `pay_item_num_1d` bigint, 
+  `allot_ratio_1w` double, 
+  `pay_item_num_1w` bigint, 
+  `allot_ratio_2w` double, 
+  `pay_item_num_2w` bigint)
+  PARTITIONED BY ( 
+  `date` string)
+ROW FORMAT SERDE 
+  'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe' 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.mapred.TextInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+  'hdfs://master:8020/user/hive/warehouse/dws.db/dws_pangge_item_allot_day'

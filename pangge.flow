@@ -1,0 +1,683 @@
+---
+config:
+
+nodes:   
+  # ods汇总
+  - name: ods_merge
+    type: flow
+
+    nodes:
+      # 订单汇总
+      - name: vvic_order_merge
+        type: command
+        config:
+          command: sh ./ods_merge/vvic_order_merge/vvic_order_merge.sh
+      
+      # 订单明细汇总表
+      - name: vvic_order_details_merge
+        type: command
+        config:
+          command: sh ./ods_merge/vvic_order_details_merge/vvic_order_details_merge.sh
+      
+      # 订单标签汇总表
+      - name: wms_prodcut_label_merge
+        type: command
+        config:
+          command: sh ./ods_merge/wms_prodcut_label_merge/wms_prodcut_label_merge.sh
+      
+      # 退货标签汇总表
+      - name: wms_return_label_merge
+        type: command
+        config:
+          command: sh ./ods_merge/wms_return_label_merge/wms_return_label_merge.sh
+
+      # 退货交易汇总表
+      - name: wms_return_trade_merge
+        type: command
+        config:
+          command: sh ./ods_merge/wms_return_trade_merge/wms_return_trade_merge.sh
+
+      # 退货订单汇总表
+      - name: wms_return_order_merge
+        type: command
+        config:
+          command: sh ./ods_merge/wms_return_order_merge/wms_return_order_merge.sh
+
+      # 档口关停log
+      - name: t_shop_punish_log
+        type: command
+        config:
+          command: sh ./ods_merge/t_shop_punish_log/t_shop_punish_log.sh
+    
+    
+  # ods历史变更
+  - name: ods_his
+    type: flow
+
+    nodes:
+      # 合作档口历史变更表
+      - name: cooperate_shop_his
+        type: command
+        config:
+          command: sh ./ods_his/cooperate_shop_his/cooperate_shop_his.sh
+      
+      # 订单明细汇总表
+      - name: t_cooperate_label_his
+        type: command
+        config:
+          command: sh ./ods_his/t_cooperate_label_his/t_cooperate_label_his.sh
+
+  # dw层数据仓库计算
+  - name: dw_dim
+    type: flow
+    dependsOn:
+      - ods_merge
+      - ods_his
+    
+    nodes:
+      - name: dim_wms_product_label
+        type: command
+        config:
+          command: sh ./dw_dim/dim_wms_product_label/dim_wms_product_label.sh
+
+  # dw层数据仓库计算
+  - name: dw_fct_pangge
+    type: flow
+    dependsOn:
+      - dw_dim
+
+    nodes:
+      # pangge下单支付订单商品表
+      - name: fct_pangge_pay_order_item
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/fct_pangge_pay_order_item/fct_pangge_pay_order_item.sh
+      
+      # pangge下单支付订单表
+      - name: fct_pangge_pay_order
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/fct_pangge_pay_order/fct_pangge_pay_order.sh
+        dependsOn:
+          - fct_pangge_pay_order_item
+      
+      # 每天档口的入库量与入库数量
+      - name: dws_pangge_shop_order_day
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/dws_pangge_shop_order_day/dws_pangge_shop_order_day.sh
+        dependsOn:
+          - fct_pangge_pay_order_item
+      
+      # 每天档口的下单量与下单数量
+      - name: dws_pangge_shop_pay_day
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/dws_pangge_shop_pay_day/dws_pangge_shop_pay_day.sh
+        dependsOn:
+          - fct_pangge_pay_order_item
+
+      # pangge退货标签表
+      - name: fct_pangge_return_label
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/fct_pangge_return_label/fct_pangge_return_label.sh
+
+      # pangge发货信息表
+      - name: fct_pangge_ship_item
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/fct_pangge_ship_item/fct_pangge_ship_item.sh
+        dependsOn:
+          - fct_pangge_pay_order_item 
+      
+      # pangge档口备货数据
+      - name: fct_pangge_stock_item
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/fct_pangge_stock_item/fct_pangge_stock_item.sh
+      
+      # pangge档口备货数据[生产需要，提前]
+      - name: rpt_pangge_shop_stock
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/rpt_pangge_shop_stock/rpt_pangge_shop_stock.sh
+        dependsOn:
+          - fct_pangge_stock_item
+      # 新的备货率口径
+      - name: rpt_pangge_shop_stock2
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/rpt_pangge_shop_stock2/rpt_pangge_shop_stock2.sh
+      
+      # hive2mysql
+      - name: rpt_pangge_shop_stock2_hive2mysql
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/rpt_pangge_shop_stock2/hivetomysql/rpt_pangge_shop_stock.sh
+        dependsOn:
+          - rpt_pangge_shop_stock2
+      
+      # pangge档口备货数据-加入了取消率、排名等数据
+      - name: rpt_pangge_shop_stock_cancel
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/rpt_pangge_shop_stock_cancel/rpt_pangge_shop_stock_cancel.sh
+        dependsOn:
+          - rpt_pangge_shop_stock2
+      
+      # hive2mysql-pangge档口备货数据-加入了取消率、排名等数据
+      - name: rpt_pangge_shop_stock_cancel_hive2mysql
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/rpt_pangge_shop_stock_cancel/hivetomysql/rpt_pangge_shop_stock_cancel.sh
+        dependsOn:
+          - rpt_pangge_shop_stock_cancel
+      
+      # 每日上新档口信息表
+      - name: rpt_pangge_shop_upshelf_daily
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/rpt_pangge_shop_upshelf_daily/rpt_pangge_shop_upshelf_daily.sh
+
+      # 打标标签
+      - name: dwd_pangge_print_label
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/dwd_pangge_print_label/dwd_pangge_print_label.sh
+
+      # 待备货标签
+      - name: dwd_pangge_enallot_label
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/dwd_pangge_enallot_label/dwd_pangge_enallot_label.sh
+        dependsOn:
+          - dwd_pangge_print_label
+      
+      # 已备货标签
+      - name: dwd_pangge_allot_label
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/dwd_pangge_allot_label/dwd_pangge_allot_label.sh
+        dependsOn:
+          - dwd_pangge_print_label
+      
+      # 档口关停最后一次复通时间表
+      - name: dwd_t_shop_punish_log_daily
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/dwd_t_shop_punish_log_daily/dwd_t_shop_punish_log_daily.sh
+      
+      # 数据同步
+      - name: ods__fms__vvic_user_account_daily
+        type: command
+        config:
+          command: sh ./ods/ods__fms__vvic_user_account_daily/vvic_user_account_daily.sh
+      
+      # 有效档口有效入仓率
+      - name: dws_pangge_mo_rate_valid_shop
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/dws_pangge_mo_rate_valid_shop/dws_pangge_mo_rate_valid_shop.sh
+        dependsOn:
+          - dwd_t_shop_punish_log_daily
+          - dws_pangge_shop_order_day
+          - dws_pangge_shop_pay_day
+
+      # 商业化账户每日余额表
+      - name: dwd__dwd_business_vvic_user_account_daily
+        type: command
+        config:
+          command: sh ./dwd/dwd__dwd_business_vvic_user_account_daily/dwd_business_vvic_user_account_daily.sh
+        dependsOn:
+          - ods__fms__vvic_user_account_daily
+
+      # 有效入仓率
+      - name: dws__dws_pangge_mo_rate_valid_shop_day
+        type: command
+        config:
+          command: sh ./dws/dws__dws_pangge_mo_rate_valid_shop_day/dws_pangge_mo_rate_valid_shop_day.sh
+        dependsOn:
+          - dwd__dwd_business_vvic_user_account_daily
+          - dws_pangge_mo_rate_valid_shop
+
+      # hive2mysql-有效档口有效入仓率
+      - name: newbi__dws_pangge_mo_rate_valid_shop
+        type: command
+        config:
+          command: /opt/anaconda3/bin/python ./vvic-bi/newbi__dws_pangge_mo_rate_valid_shop/bi__dws_pangge_mo_rate_valid_shop_day.py
+        dependsOn:
+          - dws__dws_pangge_mo_rate_valid_shop_day
+      
+      # 实发率流量干预
+      - name: dws_flow_factor
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/dws_flow_factor/dws_flow_factor.sh
+        dependsOn:
+          - dws_pangge_mo_rate_valid_shop
+      
+      # hive2mysql-实发率流量干预
+      - name: dws_flow_factor_hive2mysql
+        type: command
+        config:
+          command: sh ./dw_fct_pangge/dws_flow_factor/hivetomysql/dws_flow_factor.sh
+        dependsOn:
+          - dws_flow_factor
+
+      
+
+      
+      
+      
+
+  - name: dw_fct_cooperate
+    type: flow
+    dependsOn:
+      - dw_fct_pangge
+
+    nodes:
+      # 每日合作档口清单表
+      - name: fct_cooperate_shop
+        type: command
+        config:
+          command: sh ./dw_fct_cooperate/fct_cooperate_shop/fct_cooperate_shop.sh
+          
+      # 合作档口下单支付标签表
+      - name: fct_cooperate_pay_label
+        type: command
+        config:
+          command: sh ./dw_fct_cooperate/fct_cooperate_pay_label/fct_cooperate_pay_label.sh
+        dependsOn:
+          - fct_cooperate_shop
+
+      # 合作档口需送/分配标签表
+      - name: fct_cooperate_allot_label
+        type: command
+        config:
+          command: sh ./dw_fct_cooperate/fct_cooperate_allot_label/fct_cooperate_allot_label.sh
+      
+      # 合作档口未打印标签表
+      - name: fct_cooperate_noallot_label
+        type: command
+        config:
+          command: sh ./dw_fct_cooperate/fct_cooperate_noallot_label/fct_cooperate_noallot_label.sh
+      
+      # 合作档口实送标签表
+      - name: fct_cooperate_send_label
+        type: command
+        config:
+          command: sh ./dw_fct_cooperate/fct_cooperate_send_label/fct_cooperate_send_label.sh
+
+      # 合作档口发货标签表
+      - name: fct_cooperate_ship_label
+        type: command
+        config:
+          command: sh ./dw_fct_cooperate/fct_cooperate_ship_label/fct_cooperate_ship_label.sh
+        dependsOn:
+          - fct_cooperate_pay_label
+
+      # 合作档口退货标签表
+      - name: fct_cooperate_return_label
+        type: command
+        config:
+          command: sh ./dw_fct_cooperate/fct_cooperate_return_label/fct_cooperate_return_label.sh
+
+  # rpt层数据仓库计算
+  - name: dw_rpt_pangge
+    type: flow
+    dependsOn:
+      - dw_fct_pangge
+      - dw_fct_cooperate
+
+    nodes:
+      # pangge下单日报表
+      - name: rpt_pangge_pay_order_daily
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_pay_order_daily/rpt_pangge_pay_order_daily.sh
+
+      # pangge实发日报表
+      - name: rpt_pangge_item_ship_daily
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_item_ship_daily/rpt_pangge_item_ship_daily.sh
+
+      # pangge发货日报表
+      - name: rpt_pangge_ship_daily
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_ship_daily/rpt_pangge_ship_daily.sh
+
+      # pangge退货日报表
+      - name: rpt_pangge_return_daily
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_return_daily/rpt_pangge_return_daily.sh
+      
+      # pangge日报表
+      - name: rpt_pangge_daily
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_daily/rpt_pangge_daily.sh
+        dependsOn:
+          - rpt_pangge_item_ship_daily
+          - rpt_pangge_pay_order_daily
+          - rpt_pangge_return_daily
+          - rpt_pangge_ship_daily
+
+      # pangge留存日报表
+      - name: rpt_pangge_user_remain_daily
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_user_remain_daily/rpt_pangge_user_remain_daily.sh
+      
+      # pangge留存周报表
+      - name: rpt_pangge_user_remain_weekly
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_user_remain_weekly/rpt_pangge_user_remain_weekly.sh
+      
+      # pangge留存月报表
+      - name: rpt_pangge_user_remain_monthly
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_user_remain_monthly/rpt_pangge_user_remain_monthly.sh
+
+      # pangge实发率<下单-分配>
+      - name: rpt_pangge_pay_allot_daily
+        type: command
+        config:
+            command: sh ./dw_rpt_pangge/rpt_pangge_pay_allot_daily/rpt_pangge_pay_allot_daily.sh
+
+      # pangge实发率<下单-回货入仓>
+      - name: rpt_pangge_pay_receive_daily
+        type: command
+        config:
+            command: sh ./dw_rpt_pangge/rpt_pangge_pay_receive_daily/rpt_pangge_pay_receive_daily.sh
+
+      # pangge实发率<下单-发货>
+      - name: rpt_pangge_pay_ship_daily
+        type: command
+        config:
+            command: sh ./dw_rpt_pangge/rpt_pangge_pay_ship_daily/rpt_pangge_pay_ship_daily.sh
+
+      # pangge实发率<退货-成功>
+      - name: rpt_pangge_return_success_daily
+        type: command
+        config:
+            command: sh ./dw_rpt_pangge/rpt_pangge_return_success_daily/rpt_pangge_return_success_daily.sh
+
+      # pangge实发率<汇总>
+      - name: rpt_pangge_pay_daily
+        type: command
+        config:
+            command: sh ./dw_rpt_pangge/rpt_pangge_pay_daily/rpt_pangge_pay_daily.sh
+        dependsOn:
+            - rpt_pangge_pay_allot_daily
+            - rpt_pangge_pay_receive_daily
+            - rpt_pangge_pay_ship_daily
+            - rpt_pangge_return_success_daily
+
+      # 档口新备货率统计日报表
+      - name: dws_pangge_shop_allot_daily
+        type: command
+        config:
+            command: sh ./dw_rpt_pangge/dws_pangge_shop_allot_daily/dws_pangge_shop_allot_daily.sh
+      
+      # 
+      - name: dws_pangge_item_allot_daily
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/dws_pangge_item_allot_daily/dws_pangge_item_allot_daily.sh
+      
+      # 商品备货率
+      - name: dws_pangge_item_allot_day
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/dws_pangge_item_allot_day/dws_pangge_item_allot_day.sh 
+        dependsOn:
+            - dws_pangge_item_allot_daily
+      
+      # hive2mysql
+      - name: dws_pangge_item_allot_day_hivetomysql
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/dws_pangge_item_allot_day/hivetomysql/dws_pangge_item_allot_day.sh 
+        dependsOn:
+            - dws_pangge_item_allot_day
+      
+      # 档口备货率
+      - name: dws_pangge_shop_allot_day
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/dws_pangge_shop_allot_day/dws_pangge_shop_allot_day.sh 
+        dependsOn:
+            - dws_pangge_shop_allot_daily
+      
+      # hive2mysql
+      - name: dws_pangge_shop_allot_day_hivetomysql
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/dws_pangge_shop_allot_day/hivetomysql/dws_pangge_shop_allot_day.sh 
+        dependsOn:
+            - dws_pangge_shop_allot_day
+      
+      # 档口实拍率
+      - name: dws_pangge_shop_sp_day
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/dws_pangge_shop_sp_day/dws_pangge_shop_sp_day.sh 
+      
+      # hive2mysql
+      - name: dws_pangge_shop_sp_day_hivetomysql
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/dws_pangge_shop_sp_day/hivetomysql/dws_pangge_shop_sp_day.sh 
+        dependsOn:
+            - dws_pangge_shop_sp_day
+      
+      # 商品三天代发量
+      - name: rpt_pangge_sd_item_sales
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_sd_item_sales/rpt_pangge_sd_item_sales.sh  
+        dependsOn:
+            - dws_pangge_item_allot_day
+      
+      # hive2mysql
+      - name: rpt_pangge_sd_item_sales_hivetomysql
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_sd_item_sales/hivetomysql/rpt_pangge_sd_item_sales.sh 
+        dependsOn:
+            - rpt_pangge_sd_item_sales
+      
+      # 类目销量表
+      - name: rpt_pangge_sd_cate_sales
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_sd_cate_sales/rpt_pangge_sd_cate_sales.sh 
+        dependsOn:
+            - rpt_pangge_sd_item_sales
+      
+      # hive2mysql
+      - name: rpt_pangge_sd_cate_sales_hivetomysql
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_sd_cate_sales/hivetomysql/rpt_pangge_sd_cate_sales.sh 
+        dependsOn:
+            - rpt_pangge_sd_cate_sales
+      
+      # 用户类目推荐表
+      - name: rpt_pangge_sd_user_cate_rec
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_sd_user_cate_rec/rpt_pangge_sd_user_cate_rec.sh 
+        dependsOn:
+            - rpt_pangge_sd_cate_sales
+      
+      # hive2mysql
+      - name: rpt_pangge_sd_user_cate_rec_hivetomysql
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_sd_user_cate_rec/hivetomysql/rpt_pangge_sd_user_cate_rec.sh 
+        dependsOn:
+            - rpt_pangge_sd_user_cate_rec
+      
+      # 档口备货率表
+      - name: rpt_pangge_sd_shop_sales
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_sd_shop_sales/rpt_pangge_sd_shop_sales.sh 
+        dependsOn:
+            - dws_pangge_shop_allot_day
+            - rpt_pangge_sd_item_sales
+      
+      # hive2mysql
+      - name: rpt_pangge_sd_shop_sales_hivetomysql
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_sd_shop_sales/hivetomysql/rpt_pangge_sd_shop_sales.sh 
+        dependsOn:
+            - rpt_pangge_sd_shop_sales
+      
+      # 用户商品推荐表
+      - name: rpt_pangge_sd_recommend_item
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_sd_recommend_item/rpt_pangge_sd_recommend_item.sh 
+        dependsOn:
+            - dws_pangge_item_allot_day
+            - rpt_pangge_sd_item_sales
+      
+      # hive2mysql
+      - name: rpt_pangge_sd_recommend_item_hivetomysql
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/rpt_pangge_sd_recommend_item/hivetomysql/rpt_pangge_sd_recommend_item.sh 
+        dependsOn:
+            - rpt_pangge_sd_recommend_item
+      
+      # 实惠好货商品数据
+      - name: dws_strength_bargain_item
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/dws_strength_bargain_item/dws_strength_bargain_item.sh 
+        dependsOn:
+            - dws_pangge_item_allot_day
+      
+      # hive2mysql
+      - name: dws_strength_bargain_item_hivetomysql
+        type: command
+        config:
+          command: sh ./dw_rpt_pangge/dws_strength_bargain_item/hivetomysql/dws_strength_bargain_item.sh 
+        dependsOn:
+            - dws_strength_bargain_item
+      
+
+  - name: dw_rpt_cooperate
+    type: flow
+    dependsOn:
+      - dw_fct_cooperate
+
+    nodes:
+      # 每日合作档口统计表
+      - name: rpt_cooperate_shop
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/rpt_cooperate_shop/rpt_cooperate_shop.sh
+
+      # 合作档口商品统计日报表
+      - name: rpt_cooperate_item_daily
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/rpt_cooperate_item_daily/rpt_cooperate_item_daily.sh
+
+      # 合作档口商品统计日报表
+      - name: rpt_cooperate_item_daily2
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/rpt_cooperate_item_daily2/rpt_cooperate_item_daily2.sh
+
+      # 合作档口商品统计日报表
+      - name: hive2mysql
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/rpt_cooperate_item_daily2/hivetomysql/rpt_cooperate_item_daily2.sh
+        dependsOn:
+          - rpt_cooperate_item_daily2  
+
+
+      # 合作档口商品发货率日报表
+      - name: rpt_cooperate_item_ship_daily
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/rpt_cooperate_item_ship_daily/rpt_cooperate_item_ship_daily.sh   
+
+      # 合作档口日报表
+      - name: rpt_cooperate_shop_daily
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/rpt_cooperate_shop_daily/rpt_cooperate_shop_daily.sh
+        dependsOn:
+          - rpt_cooperate_shop  
+          - rpt_cooperate_item_daily
+      
+      # 合作档口日报表
+      - name: rpt_cooperate_shop_daily2
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/rpt_cooperate_shop_daily2/rpt_cooperate_shop_daily2.sh
+        dependsOn:
+          - rpt_cooperate_shop  
+          - rpt_cooperate_item_daily2
+      
+      # 合作档口日报表（后台使用）
+      - name: rpt_cooperate_shop_daily3
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/rpt_cooperate_shop_daily3/rpt_cooperate_shop_daily3.sh
+      - name: hive2mysql
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/rpt_cooperate_shop_daily3/hivetomysql/rpt_cooperate_shop_daily3.sh
+        dependsOn:
+          - rpt_cooperate_shop_daily3  
+  
+      - name: hive2mysql
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/rpt_cooperate_shop_daily3/hivetomysql/rpt_cooperate_daily.sh
+        dependsOn:
+          - rpt_cooperate_shop_daily3
+
+      # 直播频道的商品
+      - name: dws_plat_live_item_day
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/dws_plat_live_item_day/dws_plat_live_item_day.sh
+
+      # 
+      - name: dws_plat_live_item_day_hivetomysql
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/dws_plat_live_item_day/hivetomysql/dws_plat_live_item_day.sh
+        dependsOn:
+          - dws_plat_live_item_day
+
+      # ROI需要召回的档口
+      - name: dws_recsys_recall_shop_daily
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/dws_recsys_recall_shop_daily/dws_recsys_recall_shop_daily.sh
+        dependsOn:
+          - dws_plat_live_item_day
+
+      # 
+      - name: dws_plat_shop_roi_day_hivetomysql
+        type: command
+        config:
+          command: sh ./dw_rpt_cooperate/dws_recsys_recall_shop_daily/hivetomysql/dws_plat_shop_roi_day.sh
+        dependsOn:
+          - dws_recsys_recall_shop_daily  

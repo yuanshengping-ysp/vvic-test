@@ -1,0 +1,157 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                 "channel": 3
+            },
+            "errorLimit": {
+                "record": 3,
+                "percentage": 0.02
+            }
+        },
+        "content": [
+            {
+                "reader": {
+                   "name": "hdfsreader",
+                   "parameter": {
+                        "path": "/user/hive/warehouse/temp.db/dws_plat_shop_roi_day/*",
+                        "defaultFS": "hdfs://master:8020",
+                        "column": [
+                        	  
+                        		   {
+                        		   	"index": 0,
+                                "type": "string"
+                                },
+                               {
+                                "index": 1,
+                                "type": "string"
+                               },
+                               {
+                                "index": 2,
+                                "type": "string"
+                               },
+                                {
+                                "index": 3,
+                                "type": "string"
+                               },
+                               {
+                                "index": 4,
+                                "type": "string"
+                               },
+                                {
+                                "index": 5,
+                                "type": "string"
+                               },
+                                {
+                                "index": 6,
+                                "type": "string"
+                               },
+                                {
+                                "index": 7,
+                                "type": "string"
+                               },
+                                {
+                                "index": 8,
+                                "type": "string"
+                               },
+                                {
+                                "index": 9,
+                                "type": "string"
+                               },
+                                {
+                                "index": 10,
+                                "type": "string"
+                               },
+                                {
+                                "index": 11,
+                                "type": "string"
+                               },
+                                {
+                                "index": 12,
+                                "type": "string"
+                               },
+                                {
+                                "index": 13,
+                                "type": "string"
+                               },
+                                {
+                                "index": 14,
+                                "type": "string"
+                               },
+                                {
+                                "index": 15,
+                                "type": "string"
+                               },
+                                {
+                                "index": 16,
+                                "type": "string"
+                               },
+                                {
+                                "index": 17,
+                                "type": "string"
+                               },
+                                {
+                                "index": 18,
+                                "type": "string"
+                               },
+                               {
+                                "type": "string",
+                                "value": "$DATE"
+                               }
+                        ],
+                        "fileType": "text",
+                        "encoding": "UTF-8",
+                        "fieldDelimiter": "\u0001"
+                    }
+                      
+                },
+                "writer": {
+                    "name": "mysqlwriter",
+                    "parameter": {
+                       "writeMode": "insert",
+                        "username": "biz_i",
+                        "password": "sdalf-e77+%rUohF",
+                        "column": [
+							"city_market_id",
+                            "shop_id",
+                            "roi_shop_type",
+                            "shop_roi_2w",
+                            "total_cost_amt_2w",
+                            "upload_num_2w",
+                            "upload_user_num_2w",
+                            "fav_item_num_2w",
+                            "fav_item_user_num_2w",
+                            "fav_shop_num_2w",
+                            "fav_shop_user_num_2w",
+                            "datapack_down_num_2w",
+                            "datapack_down_user_num_2w",
+                            "median_down_num_2w",
+                            "median_down_user_num_2w",
+                            "addcart_num_2w",
+                            "addcart_user_num_2w",
+                            "roi_res",
+                            "roi_factor",
+                            "date"
+                        ],
+                        "preSql": [
+                            " truncate table dws_plat_shop_roi_day  "
+                        ],
+                         "connection": [
+                            {
+                                "jdbcUrl": "jdbc:mysql://rdsok37zgsk574d212nr183.mysql.rds.aliyuncs.com:3306/vvic-bi",
+                                "table": [
+                                    "dws_plat_shop_roi_day"
+                                ]
+                            }
+                        ],
+                        "postSql": [
+                            "INSERT INTO rpt_monitoring SET table_name = 'dws_plat_shop_roi_day', insert_time = current_date "
+                        ]
+
+                      
+                    }
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,97 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                 "channel": 3
+            },
+            "errorLimit": {
+                "record": 3,
+                "percentage": 0.02
+            }
+        },
+        "content": [
+            {
+                "reader": {
+                   "name": "hdfsreader",
+                   "parameter": {
+                        "path": "/user/hive/warehouse/dws.db/dws_plat_live_item_day/date=$DATE/*",
+                        "defaultFS": "hdfs://master:8020",
+                        "column": [
+                        	  
+                        		   {
+                        		   	"index": 0,
+                                "type": "string"
+                                },
+                               {
+                                "index": 1,
+                                "type": "string"
+                               },
+                               {
+                                "index": 2,
+                                "type": "string"
+                               },
+                                {
+                                "index": 3,
+                                "type": "string"
+                               },
+                               {
+                                "index": 4,
+                                "type": "string"
+                               },
+                                {
+                                "index": 5,
+                                "type": "string"
+                               },
+                                {
+                                "index": 6,
+                                "type": "string"
+                               },
+                               {
+                                "type": "string",
+                                "value": "$DATE"
+                               }
+                        ],
+                        "fileType": "text",
+                        "encoding": "UTF-8",
+                        "fieldDelimiter": "\u0001"
+                    }
+                      
+                },
+                "writer": {
+                    "name": "mysqlwriter",
+                    "parameter": {
+                       "writeMode": "insert",
+                        "username": "biz_i",
+                        "password": "1JL7FNMKI690LwHa",
+                        "column": [
+                        	  "item_id",
+                            "vcid",
+                            "shop_id",
+                            "pay_item_num_3d",
+                            "pay_user_num_3d",
+                            "up_time",
+							"valid_receive_item_ratio_7d",
+							"date"
+                        ],
+                        "preSql": [
+                            " truncate table dws_plat_live_item_day  "
+                        ],
+                         "connection": [
+                            {
+                                "jdbcUrl": "jdbc:mysql://probi001.mysql.rds.aliyuncs.com:3306/vvic-bi",
+                                "table": [
+                                    "dws_plat_live_item_day"
+                                ]
+                            }
+                        ],
+                        "postSql": [
+                            "INSERT INTO rpt_monitoring SET table_name = 'dws_plat_live_item_day', insert_time = current_date "
+                        ]
+
+                      
+                    }
+                }
+            }
+        ]
+    }
+}

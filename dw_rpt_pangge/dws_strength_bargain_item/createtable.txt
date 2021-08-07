@@ -1,0 +1,18 @@
+
+CREATE TABLE `dws.dws_strength_hot_item`(
+  `item_id` bigint, 
+  `shop_id` int, 
+  `city_market_id` bigint, 
+  `up_shelf_time` string, 
+  `pay_item_num_3d` bigint, 
+  `rank` int)
+  PARTITIONED BY ( 
+  `date` string)
+ROW FORMAT SERDE 
+  'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe' 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.mapred.TextInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+  'hdfs://master:8020/user/hive/warehouse/dws.db/dws_strength_hot_item'

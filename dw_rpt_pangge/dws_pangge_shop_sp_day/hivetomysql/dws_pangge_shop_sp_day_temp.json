@@ -1,0 +1,91 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                 "channel": 3
+            },
+            "errorLimit": {
+                "record": 3,
+                "percentage": 0.02
+            }
+        },
+        "content": [
+            {
+                "reader": {
+                   "name": "hdfsreader",
+                   "parameter": {
+                        "path": "/user/hive/warehouse/temp.db/dws_pangge_shop_sp_day/*",
+                        "defaultFS": "hdfs://master:8020",
+                        "column": [
+                        	  
+                        		   {
+                        		   	"index": 0,
+                                "type": "string"
+                                },
+                               {
+                                "index": 1,
+                                "type": "int"
+                               },
+                               {
+                                "index": 2,
+                                "type": "double"
+                               },
+                                {
+                                "index": 3,
+                                "type": "double"
+                               },{
+                                "index": 4,
+                                "type": "double"
+                               },
+                                {
+                                "index": 5,
+                                "type": "double"
+                               },
+                               {
+                                "index": 6,
+                                "type": "string"
+                               }
+                        ],
+                        "fileType": "text",
+                        "encoding": "UTF-8",
+                        "fieldDelimiter": "\u0001"
+                    }
+                      
+                },
+                "writer": {
+                    "name": "mysqlwriter",
+                    "parameter": {
+                       "writeMode": "insert",
+                        "username": "biz_i",
+                        "password": "1JL7FNMKI690LwHa",
+                        "column": [
+                        	  "city_market_id",
+                        	  "shop_id",
+                        	  "opp_sp_ratio_180d",
+                        	  "sp_ratio_180d",
+                        	  "opp_sp_ratio",
+                        	  "sp_ratio",
+                        	  "date"
+                        ],
+                        "preSql": [
+                            " truncate table dws_pangge_shop_sp_day "
+                        ],
+                         "connection": [
+                            {
+                                "jdbcUrl": "jdbc:mysql://probi001.mysql.rds.aliyuncs.com:3306/vvic-bi",
+                                "table": [
+                                    "dws_pangge_shop_sp_day"
+                                ]
+                            }
+                        ],
+                        "postSql": [
+                            "INSERT INTO rpt_monitoring SET table_name = 'dws_pangge_shop_sp_day', insert_time = current_date "
+                        ]
+
+                      
+                    }
+                }
+            }
+        ]
+    }
+}

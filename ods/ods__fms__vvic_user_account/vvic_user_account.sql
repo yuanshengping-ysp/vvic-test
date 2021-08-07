@@ -1,0 +1,25 @@
+create table if not exists `ods`.`fms__vvic_user_account` ( 
+`account_id` bigint comment '资金信息ID',
+`user_id` bigint comment '用户ID',
+`shop_id` bigint comment '档口id',
+`shop_name` string comment '档口名称',
+`user_name` string comment '用户名称',
+`account_type` int comment '账户类型：1-CPC账户，2-CPT账户，3-实力质造账户',
+`account_level` int comment '账户级别',
+`user_mobile` string comment '用户绑定的手机号码',
+`pay_pwd` string comment '支付密码',
+`id_card` string comment '身份证号码',
+`account_amount` double comment '用户账户金额',
+`frozen_amount` double comment '用户冻结金额',
+`arrears_amount` double comment '欠费金额',
+`gift_amount` double comment '赠送资金',
+`is_signed` int comment '是否开通资金账户；0：否，1：是',
+`info_id` bigint comment '个人信息id',
+`status` int comment '账号状态；0：正常，1：待审核，2：冻结',
+`create_time` string comment '添加时间',
+`update_time` string comment '更新时间',
+`technical_amount` double comment '技术服务费',
+`security_amount` double comment '保证金',
+`frozen_gift_amount` double comment '冻结赠送资金' ) 
+ stored as textfile 
+ location 'hdfs://master:8020/user/hive/warehouse/ods.db/fms__vvic_user_account' ;

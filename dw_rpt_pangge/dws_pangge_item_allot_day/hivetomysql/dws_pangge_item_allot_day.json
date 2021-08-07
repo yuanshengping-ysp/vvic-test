@@ -1,0 +1,107 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                 "channel": 3
+            },
+            "errorLimit": {
+                "record": 3,
+                "percentage": 0.02
+            }
+        },
+        "content": [
+            {
+                "reader": {
+                   "name": "hdfsreader",
+                   "parameter": {
+                        "path": "/user/hive/warehouse/dws.db/dws_pangge_item_allot_day/date=$DATE/*",
+                        "defaultFS": "hdfs://master:8020",
+                        "column": [
+                        	  
+                        		   {
+                        		   	"index": 0,
+                                "type": "string"
+                                },
+                               {
+                                "index": 1,
+                                "type": "string"
+                               },
+                               {
+                                "index": 2,
+                                "type": "string"
+                               },
+                                {
+                                "index": 3,
+                                "type": "double"
+                               },
+                               {
+                                "index": 4,
+                                "type": "int"
+                               },
+                                {
+                                "index": 5,
+                                "type": "double"
+                               },
+                               {
+                                "index": 6,
+                                "type": "int"
+                               },
+                                {
+                                "index": 7,
+                                "type": "double"
+                               },
+                               {
+                                "index": 8,
+                                "type": "int"
+                               },
+                                {
+                                "index": 9,
+                                "type": "string"
+                               }
+                        ],
+                        "fileType": "text",
+                        "encoding": "UTF-8",
+                        "fieldDelimiter": "\u0001"
+                    }
+                      
+                },
+                "writer": {
+                    "name": "mysqlwriter",
+                    "parameter": {
+                       "writeMode": "insert",
+                        "username": "biz_i",
+                        "password": "1JL7FNMKI690LwHa",
+                        "column": [
+                        	  "city_market_id",
+                        	  "shop_id",
+                        	  "item_id",
+                        	  "allot_ratio_1d",
+                        	  "pay_item_num_1d",
+                        	  "allot_ratio_1w",
+                        	  "pay_item_num_1w",
+                        	  "allot_ratio_2w",
+                        	  "pay_item_num_2w",
+                        	  "date"
+                        ],
+                        "preSql": [
+                            " delete from dws_pangge_item_allot_day where date ='$DATE'   "
+                        ],
+                         "connection": [
+                            {
+                                "jdbcUrl": "jdbc:mysql://probi001.mysql.rds.aliyuncs.com:3306/vvic-bi",
+                                "table": [
+                                    "dws_pangge_item_allot_day"
+                                ]
+                            }
+                        ],
+                        "postSql": [
+                            "INSERT INTO rpt_monitoring SET table_name = 'dws_pangge_item_allot_day', insert_time = current_date "
+                        ]
+
+                      
+                    }
+                }
+            }
+        ]
+    }
+}

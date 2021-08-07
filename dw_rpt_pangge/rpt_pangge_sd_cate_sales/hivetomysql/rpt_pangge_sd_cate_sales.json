@@ -1,0 +1,82 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                 "channel": 3
+            },
+            "errorLimit": {
+                "record": 3,
+                "percentage": 0.02
+            }
+        },
+        "content": [
+            {
+                "reader": {
+                   "name": "hdfsreader",
+                   "parameter": {
+                        "path": "/user/hive/warehouse/rpt.db/rpt_pangge_sd_cate_sales/*",
+                        "defaultFS": "hdfs://master:8020",
+                        "column": [
+                        	  
+                        		   {
+                        		   	"index": 1,
+                                "type": "string"
+                                },
+								{
+                        		   	"index": 2,
+                                "type": "string"
+                                },
+                               {
+                                "index": 3,
+                                "type": "int"
+                               },
+                               {
+                                "index": 4,
+                                "type": "int"
+                               },
+                                {
+                                "index": 5,
+                                "type": "string"
+                               }
+                        ],
+                        "fileType": "text",
+                        "encoding": "UTF-8",
+                        "fieldDelimiter": "\u0001"
+                    }
+                      
+                },
+                "writer": {
+                    "name": "mysqlwriter",
+                    "parameter": {
+                       "writeMode": "insert",
+                        "username": "biz_i",
+                        "password": "1JL7FNMKI690LwHa",
+                        "column": [
+                        	  "vcid",
+							  "vcname",
+                        	  "sales_num_3d",
+                        	  "sales_item_num_3d",
+                        	  "date"
+                        ],
+                        "preSql": [
+                            " truncate table rpt_pangge_sd_cate_sales "
+                        ],
+                         "connection": [
+                            {
+                                "jdbcUrl": "jdbc:mysql://probi001.mysql.rds.aliyuncs.com:3306/vvic-bi",
+                                "table": [
+                                    "rpt_pangge_sd_cate_sales"
+                                ]
+                            }
+                        ],
+                        "postSql": [
+                            "INSERT INTO rpt_monitoring SET table_name = 'rpt_pangge_sd_cate_sales', insert_time = current_date "
+                        ]
+
+                      
+                    }
+                }
+            }
+        ]
+    }
+}

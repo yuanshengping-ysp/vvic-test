@@ -1,0 +1,21 @@
+
+
+CREATE TABLE `dws.dws_pangge_shop_sp_day`(
+  `city_market_id` bigint, 
+  `shop_id` int, 
+  `opp_sp_ratio` double, 
+  `sp_ratio` double,
+  `item_num` int,
+  `item_num_sp` int)
+PARTITIONED BY ( 
+  `date` string)
+ROW FORMAT SERDE 
+  'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe' 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.mapred.TextInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+  'hdfs://master:8020/user/hive/warehouse/dws.db/dws_pangge_shop_sp_day'
+TBLPROPERTIES (
+  'transient_lastDdlTime'='1592279870')

@@ -1,0 +1,122 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                 "channel": 3
+            },
+            "errorLimit": {
+                "record": 3,
+                "percentage": 0.02
+            }
+        },
+        "content": [
+            {
+                "reader": {
+                   "name": "hdfsreader",
+                   "parameter": {
+                        "path": "/user/hive/warehouse/temp.db/rpt_pangge_shop_stock2/*",
+                        "defaultFS": "hdfs://master:8020",
+                        "column": [
+                        	  
+                        		   {
+                        		   	"index": 0,
+                                "type": "string"
+                                },
+                               {
+                                "index": 1,
+                                "type": "string"
+                               },
+                               {
+                                "index": 2,
+                                "type": "string"
+                               },
+                                {
+                                "index": 3,
+                                "type": "string"
+                               },
+                               {
+                                "index": 4,
+                                "type": "string"
+                               },
+                                {
+                                "index": 5,
+                                "type": "string"
+                               },
+                               {
+                                "index": 6,
+                                "type": "string"
+                               },
+                                {
+                                "index": 7,
+                                "type": "string"
+                               },
+                               {
+                                "index": 8,
+                                "type": "string"
+                               },
+                                {
+                                "index": 9,
+                                "type": "string"
+                               },
+                                {
+                                "index": 10,
+                                "type": "string"
+                               },
+                                {
+                                "index": 11,
+                                "type": "string"
+                               },
+                                {
+                                "index": 12,
+                                "type": "string"
+                               }
+                        ],
+                        "fileType": "text",
+                        "encoding": "UTF-8",
+                        "fieldDelimiter": "\u0001"
+                    }
+                      
+                },
+                "writer": {
+                    "name": "mysqlwriter",
+                    "parameter": {
+                       "writeMode": "insert",
+                        "username": "biz_i",
+                        "password": "1JL7FNMKI690LwHa",
+                        "column": [
+                            "city_market_id",
+                            "shop_id",
+                            "pay_shop_num_2w",
+                            "pay_shop_num_2w_45",
+                            "pay_item_num_2w",
+                            "allot_item_num_2w",
+                            "receive_item_num_2d",
+                            "receive_item_num_ratio_2d",
+                            "receive_item_num_ratio_2d_rank",
+                            "receive_item_num_ratio_2d_compare",
+                            "receive_item_num_ratio_2d_rank_45",
+                            "receive_item_num_ratio_2d_compare_45",
+                            "date"
+                        ],
+                        "preSql": [
+                            " delete from rpt_pangge_shop_stock where date ='$DATE'  "
+                        ],
+                         "connection": [
+                            {
+                                "jdbcUrl": "jdbc:mysql://probi001.mysql.rds.aliyuncs.com:3306/vvic-bi",
+                                "table": [
+                                    "rpt_pangge_shop_stock"
+                                ]
+                            }
+                        ],
+                        "postSql": [
+                            "INSERT INTO rpt_monitoring SET table_name = 'rpt_pangge_shop_stock', insert_time = current_date "
+                        ]
+
+                      
+                    }
+                }
+            }
+        ]
+    }
+}

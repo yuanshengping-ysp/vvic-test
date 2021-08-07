@@ -1,0 +1,117 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                 "channel": 3
+            },
+            "errorLimit": {
+                "record": 3,
+                "percentage": 0.02
+            }
+        },
+        "content": [
+            {
+                "reader": {
+                   "name": "hdfsreader",
+                   "parameter": {
+                        "path": "/user/hive/warehouse/rpt.db/rpt_cooperate_item_daily2/*",
+                        "defaultFS": "hdfs://master:8020",
+                        "column": [
+                               {
+                                "index": 0,
+                                "type": "string"
+                                },
+                               {
+                                "index": 1,
+                                "type": "string"
+                               },
+                               {
+                                "index": 2,
+                                "type": "string"
+                               },
+                                {
+                                "index": 3,
+                                "type": "string"
+                               },
+                               {
+                                "index": 4,
+                                "type": "string"
+                               },
+                                {
+                                "index": 5,
+                                "type": "string"
+                               },
+                               {
+                                "index": 6,
+                                "type": "string"
+                               },
+                                {
+                                "index": 7,
+                                "type": "string"
+                               },
+                                {
+                                "index": 8,
+                                "type": "string"
+                               },
+                                {
+                                "index": 9,
+                                "type": "string"
+                               },
+                                {
+                                "index": 10,
+                                "type": "string"
+                               },
+                                {
+                                "index": 11,
+                                "type": "string"
+                               },
+                                {
+                                "index": 12,
+                                "type": "string"
+                               }
+                        ],
+                        "fileType": "text",
+                        "encoding": "UTF-8",
+                        "fieldDelimiter": "\u0001"
+                    }
+                      
+                },
+                "writer": {
+                    "name": "mysqlwriter",
+                    "parameter": {
+                       "writeMode": "insert",
+                        "username": "biz_i",
+                        "password": "1JL7FNMKI690LwHa",
+                        "column": [
+                             "shop_id",
+                             "shop_name",
+                             "bid",
+                             "market_name",
+                             "item_id",
+                             "item_sku_id",
+                             "lower_price",
+                             "noallot_item_num",
+                             "allot_item_num",
+                             "send_item_num",
+                             "return_item_num",
+                             "return_success_item_num",
+                             "date"
+                        ],
+                        "preSql": [
+                            "truncate table rpt_cooperate_item_daily2 "
+                        ],
+                         "connection": [
+                            {
+                                "jdbcUrl": "jdbc:mysql://probi001.mysql.rds.aliyuncs.com:3306/vvic-bi",
+                                "table": [
+                                    "rpt_cooperate_item_daily2"
+                                ]
+                            }
+                        ]
+                      
+                    }
+                }
+            }
+        ]
+    }
+}

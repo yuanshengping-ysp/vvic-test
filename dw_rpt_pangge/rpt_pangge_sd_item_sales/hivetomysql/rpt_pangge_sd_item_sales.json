@@ -1,0 +1,112 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                 "channel": 3
+            },
+            "errorLimit": {
+                "record": 3,
+                "percentage": 0.02
+            }
+        },
+        "content": [
+            {
+                "reader": {
+                   "name": "hdfsreader",
+                   "parameter": {
+                        "path": "/user/hive/warehouse/rpt.db/rpt_pangge_sd_item_sales/*",
+                        "defaultFS": "hdfs://master:8020",
+                        "column": [
+                        	  
+                        		   {
+                        		   	"index": 0,
+                                "type": "int"
+                                },
+                               {
+                                "index": 1,
+                                "type": "int"
+                               },
+                               {
+                                "index": 2,
+                                "type": "int"
+                               },
+                                {
+                                "index": 3,
+                                "type": "string"
+                               },
+                                {
+                                "index": 4,
+                                "type": "double"
+                               },
+                                {
+                                "index": 5,
+                                "type": "string"
+                               },
+                                {
+                                "index": 6,
+                                "type": "double"
+                               },
+                                {
+                                "index": 7,
+                                "type": "double"
+                               },
+                                {
+                                "index": 8,
+                                "type": "string"
+                               },
+                                {
+                                "index": 9,
+                                "type": "string"
+                               },
+                                {
+                                "index": 10,
+                                "type": "string"
+                               }
+                        ],
+                        "fileType": "text",
+                        "encoding": "UTF-8",
+                        "fieldDelimiter": "\u0001"
+                    }
+                      
+                },
+                "writer": {
+                    "name": "mysqlwriter",
+                    "parameter": {
+                       "writeMode": "insert",
+                        "username": "biz_i",
+                        "password": "1JL7FNMKI690LwHa",
+                        "column": [
+                        	  "item_id",
+                        	  "shop_id",
+                        	  "sales_num_3d",
+							  "discount_price",
+                        	  "vcid",
+                        	  "ad_cate_id",
+							  "allot_ratio_1w",
+							  "pay_item_num_1w",
+							  "title",
+							  "index_img_url",
+                        	  "date"
+                        ],
+                        "preSql": [
+                            " truncate table rpt_pangge_sd_item_sales "
+                        ],
+                         "connection": [
+                            {
+                                "jdbcUrl": "jdbc:mysql://probi001.mysql.rds.aliyuncs.com:3306/vvic-bi",
+                                "table": [
+                                    "rpt_pangge_sd_item_sales"
+                                ]
+                            }
+                        ],
+                        "postSql": [
+                            "INSERT INTO rpt_monitoring SET table_name = 'rpt_pangge_sd_item_sales', insert_time = current_date "
+                        ]
+
+                      
+                    }
+                }
+            }
+        ]
+    }
+}

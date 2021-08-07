@@ -1,0 +1,17 @@
+
+CREATE TABLE `dws.dws_flow_factor`(
+  `city_market_code` string COMMENT '站点code', 
+  `shop_id` bigint COMMENT '档口id,站点默认值为-1', 
+  `mo_rate_7d` double COMMENT '7天有效入仓率', 
+  `flow_factor` double COMMENT '流量干预因子')
+COMMENT '实发率控制因子'
+PARTITIONED BY ( 
+  `date` string COMMENT '统计日期')
+ROW FORMAT SERDE 
+  'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe' 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.mapred.TextInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+  'hdfs://master:8020/user/hive/warehouse/dws.db/dws_flow_factor'

@@ -1,0 +1,247 @@
+{
+	"job": {
+		"setting": {
+			"speed": {
+				"channel": 3
+			},
+			"errorLimit": {
+				"record": 0,
+				"percentage": 0.02
+			}
+		},
+		"content": [
+			{
+				"reader": {
+					"name": "mysqlreader",
+					"parameter": {
+						"username": "biz_i",
+						"password": "sdalf-e77+%rUohF",
+						"connection": [
+							{
+								"querySql": [
+									"select `trade_id`,`pay_no`,`order_id`,replace(replace(`order_no`,char(10),''), char(13), ''),`trans_no`,replace(replace(`refund_no`,char(10),''), char(13), ''),replace(replace(`out_trade_no`,char(10),''), char(13), ''),`trade_type`,replace(replace(`trade_name`,char(10),''), char(13), ''),replace(replace(`trade_body`,char(10),''), char(13), ''),`user_id`,replace(replace(`user_name`,char(10),''), char(13), ''),replace(replace(`user_note`,char(10),''), char(13), ''),`user_money`,`user_money_bu`,`user_bank_id`,replace(replace(`user_real_name`,char(10),''), char(13), ''),`user_bank_type`,replace(replace(`user_bank_account`,char(10),''), char(13), ''),`goods_amount`,`express_fee`,`purchase_fee`,`handling_fee`,`amount`,`process_type`,`pay_type`,`pay_id`,replace(replace(`pay_name`,char(10),''), char(13), ''),replace(replace(`pay_terminal`,char(10),''), char(13), ''),replace(replace(`admin_user`,char(10),''), char(13), ''),replace(replace(`admin_note`,char(10),''), char(13), ''),replace(replace(`trade_msg`,char(10),''), char(13), ''),`shop_id`,replace(replace(`shop_name`,char(10),''), char(13), ''),`parent_id`,`trade_status`,`check_status`,`trans_status`,`adjust_fee`,`accept_amount`,`account_query`,replace(replace(`accept_time`,char(10),''), char(13), ''),replace(replace(`create_time`,char(10),''), char(13), ''),replace(replace(`update_time`,char(10),''), char(13), ''),replace(replace(`transfer_time`,char(10),''), char(13), ''),replace(replace(`pay_time`,char(10),''), char(13), ''),replace(replace(`batch_no`,char(10),''), char(13), ''),`packing_fee`,`gift_fee`,`check_quality_fee` from vvic_user_trade "
+								],
+								"jdbcUrl": [
+									"jdbc:mysql://rr-bp14l85p049o830cy.mysql.rds.aliyuncs.com:3306/vvic-ams"
+								]
+							}
+						]
+					}
+				},
+				"writer": {
+					"name": "hdfswriter",
+					"parameter": {
+						"defaultFS": "hdfs://master:8020",
+						"fileType": "text",
+						"path": "/user/hive/warehouse/ods.db/vvic_user_trade_subject",
+						"fileName": "vvic_user_trade_subject",
+						"column": [
+							{
+								"name": "trade_id",
+								"type": "bigint"
+							},
+							{
+								"name": "pay_no",
+								"type": "bigint"
+							},
+							{
+								"name": "order_id",
+								"type": "bigint"
+							},
+							{
+								"name": "order_no",
+								"type": "string"
+							},
+							{
+								"name": "trans_no",
+								"type": "bigint"
+							},
+							{
+								"name": "refund_no",
+								"type": "string"
+							},
+							{
+								"name": "out_trade_no",
+								"type": "string"
+							},
+							{
+								"name": "trade_type",
+								"type": "int"
+							},
+							{
+								"name": "trade_name",
+								"type": "string"
+							},
+							{
+								"name": "trade_body",
+								"type": "string"
+							},
+							{
+								"name": "user_id",
+								"type": "bigint"
+							},
+							{
+								"name": "user_name",
+								"type": "string"
+							},
+							{
+								"name": "user_note",
+								"type": "string"
+							},
+							{
+								"name": "user_money",
+								"type": "double"
+							},
+							{
+								"name": "user_money_bu",
+								"type": "double"
+							},
+							{
+								"name": "user_bank_id",
+								"type": "bigint"
+							},
+							{
+								"name": "user_real_name",
+								"type": "string"
+							},
+							{
+								"name": "user_bank_type",
+								"type": "int"
+							},
+							{
+								"name": "user_bank_account",
+								"type": "string"
+							},
+							{
+								"name": "goods_amount",
+								"type": "double"
+							},
+							{
+								"name": "express_fee",
+								"type": "double"
+							},
+							{
+								"name": "purchase_fee",
+								"type": "double"
+							},
+							{
+								"name": "handling_fee",
+								"type": "double"
+							},
+							{
+								"name": "amount",
+								"type": "double"
+							},
+							{
+								"name": "process_type",
+								"type": "int"
+							},
+							{
+								"name": "pay_type",
+								"type": "int"
+							},
+							{
+								"name": "pay_id",
+								"type": "bigint"
+							},
+							{
+								"name": "pay_name",
+								"type": "string"
+							},
+							{
+								"name": "pay_terminal",
+								"type": "string"
+							},
+							{
+								"name": "admin_user",
+								"type": "string"
+							},
+							{
+								"name": "admin_note",
+								"type": "string"
+							},
+							{
+								"name": "trade_msg",
+								"type": "string"
+							},
+							{
+								"name": "shop_id",
+								"type": "bigint"
+							},
+							{
+								"name": "shop_name",
+								"type": "string"
+							},
+							{
+								"name": "parent_id",
+								"type": "bigint"
+							},
+							{
+								"name": "trade_status",
+								"type": "int"
+							},
+							{
+								"name": "check_status",
+								"type": "int"
+							},
+							{
+								"name": "trans_status",
+								"type": "int"
+							},
+							{
+								"name": "adjust_fee",
+								"type": "double"
+							},
+							{
+								"name": "accept_amount",
+								"type": "double"
+							},
+							{
+								"name": "account_query",
+								"type": "int"
+							},
+							{
+								"name": "accept_time",
+								"type": "string"
+							},
+							{
+								"name": "create_time",
+								"type": "string"
+							},
+							{
+								"name": "update_time",
+								"type": "string"
+							},
+							{
+								"name": "transfer_time",
+								"type": "string"
+							},
+							{
+								"name": "pay_time",
+								"type": "string"
+							},
+							{
+								"name": "batch_no",
+								"type": "string"
+							},
+							{
+								"name": "packing_fee",
+								"type": "double"
+							},
+							{
+								"name": "gift_fee",
+								"type": "double"
+							},
+							{
+								"name": "check_quality_fee",
+								"type": "double"
+							}
+						],
+						"writeMode": "append",
+						"fieldDelimiter": "\u0001"
+					}
+				}
+			}
+		]
+	}
+}
