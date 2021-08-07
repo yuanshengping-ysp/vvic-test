@@ -85,6 +85,7 @@ def hive2mysql(json_dir,stati_date):
     #关闭hive连接
     if hive_engine is not None:
         hive_engine.close()
+        #测试
 
 if __name__ == '__main__':
     if len(sys.argv)==3:
