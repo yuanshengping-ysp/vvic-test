@@ -9,6 +9,7 @@ def dingding(message):
     data = {'msgtype': 'text','text': {'content': u'作业告警：'+message+u'失败，请及时处理！'}}
     sendData = json.dumps(data)
     request = requests.post(url,data = sendData,headers = header)
+    sys.exit(1)
 
 
 if __name__ == '__main__':
